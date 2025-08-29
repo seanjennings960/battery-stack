@@ -1,0 +1,34 @@
+name: CI
+on:
+  push: { branches: ["**"] }
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pkg: [battery-data, battery-models, battery-runtime]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install package
+        run: |
+          pip install -U pip setuptools wheel
+          pip install -e pkgs/${{ matrix.pkg }}[dev]
+      - name: Run tests
+        run: pytest pkgs/${{ matrix.pkg }}/tests -q
+
+  e2e-observer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install stack
+        run: |
+          pip install -U pip
+          pip install -e pkgs/battery-data[dev] -e pkgs/battery-models[dev] -e pkgs/battery-runtime[dev]
+      - name: Run demo
+        run: python apps/observer-demo/scripts/run_demo.py

@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+dist/
+build/
+*.egg-info/
+
+# Node
+node_modules/
+pnpm-lock.yaml
+npm-debug.log*
+
+# OS / misc
+.DS_Store
+
+# UV/Hatch/etc
+.uv/
+.hypothesis/
+
+# Editors
+.vscode/
+.idea/

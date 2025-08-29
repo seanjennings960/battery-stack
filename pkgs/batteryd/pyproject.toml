@@ -1,0 +1,11 @@
+[project]
+name = "batteryd"
+version = "0.0.1"
+requires-python = ">=3.11"
+dependencies = ["typing-extensions"]
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "mypy"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
