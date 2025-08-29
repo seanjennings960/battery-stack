@@ -1,34 +1,117 @@
 name: CI
+
 on:
-  push: { branches: ["**"] }
+  push:
+    branches: ["**"]
   pull_request:
+    branches: [main, master]
 
 jobs:
-  unit:
+  lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        pkg: [battery-data, battery-models, battery-runtime]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
+        with:
+          python-version: "3.11"
+      - name: Install hatch
+        run: pip install hatch
+      - name: Run linting
+        run: hatch run lint
+      - name: Check formatting
+        run: hatch run ruff format --check pkgs apps
+
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install hatch
+        run: pip install hatch
+      - name: Install packages for type checking
+        run: hatch run install-packages
+      - name: Run type checking
+        run: hatch run type-check
+        continue-on-error: true  # Allow type checking to fail for now
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pkg: [battery-data, battery-models, battery-runtime, batteryd]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install hatch
+        run: pip install hatch
       - name: Install package
         run: |
           pip install -U pip setuptools wheel
           pip install -e pkgs/${{ matrix.pkg }}[dev]
       - name: Run tests
-        run: pytest pkgs/${{ matrix.pkg }}/tests -q
+        run: pytest pkgs/${{ matrix.pkg }}/tests -v
+
+  test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install hatch
+        run: pip install hatch
+      - name: Install all packages
+        run: hatch run install-packages
+      - name: Run tests with coverage
+        run: hatch run cov
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   e2e-observer:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
+        with:
+          python-version: "3.11"
+      - name: Install hatch
+        run: pip install hatch
       - name: Install stack
-        run: |
-          pip install -U pip
-          pip install -e pkgs/battery-data[dev] -e pkgs/battery-models[dev] -e pkgs/battery-runtime[dev]
-      - name: Run demo
+        run: hatch run install-packages
+      - name: Run observer demo
         run: python apps/observer-demo/scripts/run_demo.py
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Docker image
+        run: docker build -t battery-stack:test .
+      - name: Test Docker image
+        run: |
+          docker run --rm battery-stack:test python -c "import battery_data, battery_models, battery_runtime, batteryd; print('All packages imported successfully')"
+
+  multi-python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install hatch
+        run: pip install hatch
+      - name: Run tests
+        run: hatch run test

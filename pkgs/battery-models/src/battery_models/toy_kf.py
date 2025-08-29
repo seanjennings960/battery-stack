@@ -1,5 +1,7 @@
+from collections.abc import Mapping
+from typing import Any
+
 import numpy as np
-from typing import Mapping, Any, Tuple
 
 
 class ToyKF:

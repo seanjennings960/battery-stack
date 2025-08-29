@@ -45,8 +45,17 @@ dependencies = [
 ]
 
 [tool.hatch.envs.test.scripts]
+install-packages = [
+    "pip install -e ./pkgs/battery-data[dev]",
+    "pip install -e ./pkgs/battery-models[dev]", 
+    "pip install -e ./pkgs/battery-runtime[dev]",
+    "pip install -e ./pkgs/batteryd[dev]",
+]
 run = "pytest {args:pkgs}"
-cov = "pytest --cov=battery_data --cov=battery_models --cov=battery_runtime --cov=batteryd {args:pkgs}"
+cov = [
+    "install-packages",
+    "pytest --cov=battery_data --cov=battery_models --cov=battery_runtime --cov=batteryd {args:pkgs}"
+]
 
 [tool.ruff]
 line-length = 100
@@ -55,6 +64,7 @@ extend-exclude = ["build", "dist"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["N806"]  # Allow uppercase variable names for mathematical notation
 
 [tool.mypy]
 python_version = "3.11"

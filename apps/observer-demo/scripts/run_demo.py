@@ -1,8 +1,9 @@
 import time
-from battery_models.toy_kf import ToyKF
-from battery_runtime.scheduler import FixedRate
-from battery_runtime.adapters import SyntheticSource, StdOutSink
+
 from battery_data.schemas import RuntimeLogRecord
+from battery_models.toy_kf import ToyKF
+from battery_runtime.adapters import StdOutSink, SyntheticSource
+from battery_runtime.scheduler import FixedRate
 
 
 def main():

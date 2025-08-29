@@ -1,13 +1,13 @@
-from typing import Any, Dict, Optional
-import sys
 import json
+import sys
 import time
+from typing import Any
 
 
 class StdInSource:
     """Reads JSON lines from stdin (non-blocking-ish if piped)."""
 
-    def read(self) -> Optional[dict[str, Any]]:
+    def read(self) -> dict[str, Any] | None:
         try:
             line = sys.stdin.readline()
             if not line:
@@ -18,7 +18,7 @@ class StdInSource:
 
 
 class StdOutSink:
-    def write(self, record: Dict[str, Any]) -> None:
+    def write(self, record: dict[str, Any]) -> None:
         print(json.dumps(record, separators=(",", ":")))
         sys.stdout.flush()
 
