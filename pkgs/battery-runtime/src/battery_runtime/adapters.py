@@ -3,8 +3,10 @@ import sys
 import json
 import time
 
+
 class StdInSource:
     """Reads JSON lines from stdin (non-blocking-ish if piped)."""
+
     def read(self) -> Optional[dict[str, Any]]:
         try:
             line = sys.stdin.readline()
@@ -14,13 +16,16 @@ class StdInSource:
         except Exception:
             return None
 
+
 class StdOutSink:
     def write(self, record: Dict[str, Any]) -> None:
         print(json.dumps(record, separators=(",", ":")))
         sys.stdout.flush()
 
+
 class SyntheticSource:
     """Simple simulator: emits {a, z} for toy KF."""
+
     def __init__(self):
         self.t0 = time.monotonic()
         self.pos = 0.0

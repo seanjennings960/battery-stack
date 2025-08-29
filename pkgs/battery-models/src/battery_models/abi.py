@@ -1,5 +1,6 @@
 from typing import Protocol, Any, Tuple, Mapping
 
+
 class ModelModule(Protocol):
     def step(self, dt: float, x: Mapping[str, Any], u: Mapping[str, Any]) -> Tuple[dict, dict]:
         """

@@ -1,6 +1,7 @@
 import time
 from typing import Callable
 
+
 class FixedRate:
     def __init__(self, hz: int = 50, max_jitter_ms: float = 5.0):
         self.period = 1.0 / hz

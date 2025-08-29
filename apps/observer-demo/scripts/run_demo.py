@@ -4,6 +4,7 @@ from battery_runtime.scheduler import FixedRate
 from battery_runtime.adapters import SyntheticSource, StdOutSink
 from battery_data.schemas import RuntimeLogRecord
 
+
 def main():
     model = ToyKF()
     src = SyntheticSource()
@@ -26,6 +27,7 @@ def main():
         sink.write(rec.model_dump())
 
     FixedRate(hz=50).run(tick, duration_s=2.0)
+
 
 if __name__ == "__main__":
     main()

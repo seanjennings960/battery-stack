@@ -1,10 +1,60 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "battery-stack"
+version = "0.0.1"
+description = "Multi-package repository for battery management and analytics"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "mypy", "pytest-cov", "hatch"]
+
+# Configure hatch to not build the root as a package
+[tool.hatch.build.targets.wheel]
+packages = []
+
+[tool.hatch.envs.default]
+skip-install = true
+dependencies = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+]
+
+[tool.hatch.envs.default.scripts]
+install-packages = [
+    "pip install -e ./pkgs/battery-data[dev]",
+    "pip install -e ./pkgs/battery-models[dev]", 
+    "pip install -e ./pkgs/battery-runtime[dev]",
+    "pip install -e ./pkgs/batteryd[dev]",
+]
+test = "pytest {args:pkgs}"
+lint = "ruff check {args:pkgs apps}"
+format = "ruff format {args:pkgs apps}"
+type-check = "mypy {args:pkgs}"
+
+# Configure hatch to work with the monorepo structure
+[tool.hatch.envs.test]
+dependencies = [
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.hatch.envs.test.scripts]
+run = "pytest {args:pkgs}"
+cov = "pytest --cov=battery_data --cov=battery_models --cov=battery_runtime --cov=batteryd {args:pkgs}"
 
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = ["build", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
 
 [tool.mypy]
 python_version = "3.11"
@@ -16,6 +66,8 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-q"
+addopts = "-v"
 testpaths = ["pkgs"]
-
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

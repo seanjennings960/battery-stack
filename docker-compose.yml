@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Development environment
+  dev:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/workspace
+      - battery-stack-cache:/root/.cache
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+      - "3000:3000"
+    environment:
+      - PYTHONPATH=/workspace
+    stdin_open: true
+    tty: true
+    command: bash
+
+  # Testing environment
+  test:
+    build:
+      context: .
+      target: testing
+    volumes:
+      - .:/workspace
+    environment:
+      - PYTHONPATH=/workspace
+    command: hatch run test
+
+  # Production environment
+  prod:
+    build:
+      context: .
+      target: production
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    restart: unless-stopped
+
+volumes:
+  battery-stack-cache:

@@ -5,7 +5,7 @@
     "ghcr.io/devcontainers/features/node:1": { "version": "22" },
     "ghcr.io/devcontainers/features/rust:1": { "version": "latest" }
   },
-  "postCreateCommand": "pip install -U pip && pip install -e pkgs/battery-data[dev] -e pkgs/battery-models[dev] -e pkgs/battery-runtime[dev]",
+  "postCreateCommand": "pip install -U pip hatch && hatch env create",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -13,8 +13,39 @@
         "charliermarsh.ruff",
         "ms-python.vscode-pylance",
         "ms-vscode.vscode-typescript-next",
-        "esbenp.prettier-vscode"
-      ]
+        "esbenp.prettier-vscode",
+        "rust-lang.rust-analyzer"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["pkgs"],
+        "python.linting.enabled": true,
+        "python.linting.ruffEnabled": true,
+        "python.formatting.provider": "none",
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+          }
+        }
+      }
+    }
+  },
+  "forwardPorts": [8000, 8080, 3000],
+  "portsAttributes": {
+    "8000": {
+      "label": "Main App",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "Dev Server",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "Frontend",
+      "onAutoForward": "notify"
     }
   }
 }
